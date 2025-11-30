@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .blog-card {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .blog-card h3 {
+            margin-top: 0;
+        }
+        .blog-card img {
+            max-width: 300px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Blog API Test</h1>
+        <p>Testing connection to: <strong>https://gsb-hackathon-backend.onrender.com/api/v1/blogs</strong></p>
+
+        <div>
+            <button onclick="testBlogs()">Test GET /api/v1/blogs</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://gsb-hackathon-backend.onrender.com';
+
+        function displayResult(data, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result ' + (isError ? 'error' : 'success');
+
+            if (Array.isArray(data)) {
+                // Display blogs in a nice format
+                let html = `<h3>Found ${data.length} blog(s)</h3>`;
+                data.forEach(blog => {
+                    html += `
+                        <div class="blog-card">
+                            <h3>${blog.title}</h3>
+                            ${blog.image_url ? `<img src="${blog.image_url}" alt="${blog.title}">` : ''}
+                            <p><strong>ID:</strong> ${blog.id}</p>
+                            <p><strong>Slug:</strong> ${blog.slug}</p>
+                            <p><strong>Author ID:</strong> ${blog.author_id}</p>
+                            <p><strong>Published:</strong> ${blog.is_published ? 'Yes' : 'No'}</p>
+                            <p><strong>Created:</strong> ${new Date(blog.created_at).toLocaleString('tr-TR')}</p>
+                            <p><strong>Content:</strong> ${blog.content.substring(0, 200)}...</p>
+                        </div>
+                    `;
+                });
+                resultDiv.innerHTML = html;
+            } else {
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            }
+        }
+
+        async function testBlogs() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/blogs`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                displayResult({
+                    error: error.message,
+                    details: error.toString()
+                }, true);
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('result').innerHTML = '';
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            testBlogs();
+        });
+    </script>
+</body>
+</html>
