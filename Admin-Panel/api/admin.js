@@ -7,15 +7,15 @@ const LOCAL_COURTS_KEY = 'mock_courts';
 const ensureSeededAdmin = () => {
   try {
     const stored = JSON.parse(localStorage.getItem(LOCAL_USERS_KEY) || '[]');
-    const hasAdmin = stored.some((u) => u.email === 'admin@kampus.edu.tr');
+    const hasAdmin = stored.some((u) => u.email === 'admin@admin.com');
     if (!hasAdmin) {
       stored.push({
         id: 'admin-1',
         display_name: 'Admin Kullanici',
-        email: 'admin@kampus.edu.tr',
+        email: 'admin@admin.com',
         profile_photo: 'https://images.unsplash.com/photo-1504595403659-9088ce801e29?auto=format&fit=crop&w=600&q=80',
         role: 'admin',
-        password: 'Admin123!',
+        password: 'admin',
       });
       localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(stored));
     }
